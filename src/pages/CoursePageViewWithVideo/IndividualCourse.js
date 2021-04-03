@@ -18,7 +18,7 @@ import ScrollTop from "../../components/backTop/index";
 // import { IonIcon } from '@ionic/react';
 // import { heartOutline, playCircleOutline } from 'ionicons/icons'
 
-import { Player, ControlBar } from "video-react";
+import ReactPlayer from "react-player/lazy";
 
 const useStyles = makeStyles((theme) => ({
   tabroot: {
@@ -36,6 +36,15 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     marginLeft: "100px",
+  },
+  playerWrapper: {
+    position: "relative",
+    paddingTop: "56.25%" /* Player ratio: 100 / (1280 / 720) */,
+  },
+  reactPlayer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
   },
   backtotop: {
     display: "flex",
@@ -56,12 +65,16 @@ export default function CoursePageViewWithVideo(props) {
     <>
       <div id="back-to-top-anchor"></div>
       <div>
-        <Player
-          className={classes.centered}
-          src="https://firebasestorage.googleapis.com/v0/b/codeforcauseorg.appspot.com/o/course%2Fzoom_0.mp4?alt=media&token=01f3ed1e-8d39-4fde-b945-f3bfe677b6df"
-        >
-          <ControlBar autoHide={true} className="my-class" />
-        </Player>
+        <div className={classes.playerWrapper}>
+          <ReactPlayer
+            url="https://firebasestorage.googleapis.com/v0/b/codeforcauseorg.appspot.com/o/course%2Fzoom_0.mp4?alt=media&token=01f3ed1e-8d39-4fde-b945-f3bfe677b6df"
+            className={classes.reactPlayer}
+            controls={true}
+            light={"https://codeforcause.org/static/temp/rn.jpeg"}
+            width="100%"
+            height="100%"
+          />
+        </div>
         <Box mt={2} ml={2}>
           <Typography variant="h3">Full Stack Development Course by Code For Cause</Typography>
           <Typography variant="body1">
