@@ -7,14 +7,6 @@ import WishlistFilterBar from "../../../components/WishlistComponents/WishlistFi
 import WishListTagSection from "../../../components/WishlistComponents/WishListTagSection";
 import MediaCard from "../../../components/CourseMediaCard/MediaCard";
 
-const mapStateToProps = (state) => ({
-  wishlist: state.wishlist,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  wishlistDeleted: (id) => dispatch(wishlistDeleted(id)),
-});
-
 const WishListView = ({ wishlist, wishlistDeleted }) => {
   const classes = useStyles();
 
@@ -22,8 +14,6 @@ const WishListView = ({ wishlist, wishlistDeleted }) => {
     title: "Wishlist",
     description:
       " Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the standard dummy text ever since the.",
-    borderColor: "4px solid #6593F5",
-    gradientColor: "linear-gradient(180deg, #6593F5 0%, #3740A1 100%)",
     otherDetails: "4 Wishlist Courses",
   };
 
@@ -32,9 +22,7 @@ const WishListView = ({ wishlist, wishlistDeleted }) => {
       <HeroSection
         title={heroElements.title}
         description={heroElements.description}
-        borderColor={heroElements.borderColor}
-        gradientColor={heroElements.gradientColor}
-        otherDetails={heroElements.otherDetails}
+        banner="assets/img/wishlistBanner.svg"
       />
       <WishlistFilterBar />
       <WishListTagSection />
@@ -73,5 +61,13 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "90%",
   },
 }));
+
+const mapStateToProps = (state) => ({
+  wishlist: state.wishlist,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  wishlistDeleted: (id) => dispatch(wishlistDeleted(id)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(WishListView);

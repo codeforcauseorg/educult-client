@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Avatar,
   Box,
   Button,
   Hidden,
@@ -8,25 +7,27 @@ import {
   makeStyles,
   Toolbar,
   Typography,
+  Badge,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import MenuIcon from "@material-ui/icons/Menu";
 import { Link, useHistory } from "react-router-dom";
-import SearchBar from "material-ui-search-bar";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import { useDispatch, useSelector } from "react-redux";
-import authService from "../../services/authService";
+import { useSelector } from "react-redux";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import AsyncSelect from "react-select/async";
+import ShopIcon from "@material-ui/icons/Shop";
 
 const navItemsLists = [
   { title: "Home", link: "/" },
-  { title: "My Course", link: "/my-course" },
+  { title: "Forum", link: "/doubt-forum" },
   { title: "Wishlist", link: "/wishlist" },
-  { title: "Profile", link: "/profile" },
+  { title: "Gamification", link: "/gamification-board" },
+  { title: "Dashboard", link: "/dashboard" },
 ];
 
 function NavBar() {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const history = useHistory();
   const user = useSelector((state) => state.account.user);
   const [scrollPositions, setscrollPositions] = useState(0);
@@ -63,25 +64,29 @@ function NavBar() {
     listenToScrollEvent();
   });
 
-  const handleLogOutAction = () => {
-    try {
-      dispatch(authService.logout());
-    } catch (err) {
-      console.log(err);
-    }
+  const searchResult = [
+    { label: "web Development", value: "web" },
+    { label: "react", value: "web" },
+    { label: "rust", value: "web" },
+  ];
+
+  const filterQuery = (inputValue) => {
+    return searchResult.filter((i) => i.label.toLowerCase().includes(inputValue.toLowerCase()));
   };
+
+  const promiseOptions = (inputValue) =>
+    new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(filterQuery(inputValue));
+      }, 1000);
+    });
 
   return (
     <div className={classes.grow}>
       <AppBar position="fixed">
         <LinearProgress variant="determinate" value={scrollPositions} />
         <Toolbar className={classes.appBar}>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="open drawer"
-          >
+          <IconButton edge="start" className={classes.menuButton} color="primary">
             <MenuIcon />
           </IconButton>
           <Hidden mdDown>
@@ -89,9 +94,21 @@ function NavBar() {
               Code for Cause
             </Typography>
           </Hidden>
-          <SearchBar
+          <AsyncSelect
             className={classes.search}
-            placeholder="Search Course, Categories or mentors..."
+            placeholder={<Typography>Search Course, Categories or mentors...</Typography>}
+            cacheOptions
+            defaultOptions
+            loadOptions={promiseOptions}
+            onChange={(opt) => history.push(`/search?q=${opt.label}&`)}
+            theme={(theme) => ({
+              ...theme,
+              borderRadius: 5,
+              colors: {
+                ...theme.colors,
+                primary: "#3740A1",
+              },
+            })}
           />
           <div className={classes.grow} />
           <Hidden lgDown>
@@ -114,33 +131,25 @@ function NavBar() {
               })}
             </Box>
           </Hidden>
-
-          <div className={classes.sectionDesktop}>
-            <Hidden mdDown>
-              {!user ? (
-                <div>
-                  <Button className={classes.signInButton}>
-                    <Typography noWrap>Sign In</Typography>
-                  </Button>
-                  <Button className={classes.signUpButton} onClick={() => history.push("/signup")}>
-                    <Typography noWrap>Sign Up</Typography>
-                  </Button>
-                </div>
-              ) : (
-                <Typography className={classes.title} variant="h6" noWrap>
-                  Hi, {user.displayName}
-                </Typography>
-              )}
-            </Hidden>
-          </div>
           {user ? (
-            <Avatar
-              className={classes.avatar}
-              src={`${user.photoURL}`}
-              onClick={() => handleLogOutAction()}
-            />
+            <>
+              <IconButton>
+                <Badge color="secondary" variant="dot">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <IconButton onClick={() => history.push("/checkout")}>
+                <Badge color="secondary" variant="standard" badgeContent={2}>
+                  <ShopIcon />
+                </Badge>
+              </IconButton>
+            </>
           ) : (
-            ""
+            <Box className={classes.buttonContainer}>
+              <Button className={classes.signUpButton} onClick={() => history.push("/signup")}>
+                <Typography noWrap>Sign Up</Typography>
+              </Button>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
@@ -151,12 +160,9 @@ function NavBar() {
 const useStyles = makeStyles((theme) => ({
   appBar: {
     backgroundColor: "#fff",
-    [theme.breakpoints.down("md")]: {
-      backgroundColor: theme.palette.primary.main,
-    },
+    boxShadow: "0 2.8px 2.2px rgba(0, 0, 0, 0.034)",
   },
   grow: {
-    flexGrow: 1,
     "& .MuiLinearProgress-colorPrimary": {
       backgroundColor: "rgb(255, 255, 255)",
     },
@@ -169,22 +175,14 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   title: {
-    display: "block",
-    color: "#000",
-    marginRight: "10px",
+    color: theme.palette.text.primary,
+    width: "15%",
   },
   search: {
-    position: "relative",
-    borderRadius: "5px",
-    boxShadow: "none",
     marginRight: theme.spacing(2),
-    width: "100%",
-    height: " 38px",
-    [theme.breakpoints.up("md")]: {
-      width: theme.spacing(50),
-      height: " 48px",
-      marginLeft: theme.spacing(5),
-    },
+    flex: 1,
+    color: theme.palette.text.primary,
+    fontFamily: "Montserrat, sans-serif",
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 2),
@@ -216,6 +214,9 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
     textTransform: "none",
     padding: theme.spacing(1, 2, 1, 2),
+  },
+  buttonContainer: {
+    display: "flex",
   },
   textStyle: {
     textDecoration: "none",
